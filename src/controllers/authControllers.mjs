@@ -4,7 +4,11 @@ import bcrypt from 'bcryptjs';
 
 
 
-const signup = async (req, res) => {
+const TOKENEXPIRATION = 60 * 60 * 24;
+
+
+
+export const signup = async (req, res) => {
     try {
         // Check if already exists 
         const existingUser = await Users.findOne({ username: req.body.username })
@@ -20,12 +24,15 @@ const signup = async (req, res) => {
         })
 
         await newUser.save();
-
+        console.log(process.env.JWT_SECRET, );
+        
         const token = jwt.sign(
             { username: newUser.username },
             process.env.JWT_SECRET,
             { expiresIn: TOKENEXPIRATION }
         );
+       
+        console.log('token ', process.env.JWT_SECRET);
         return res.status(201).json({
             token: token,
             expiresIn: TOKENEXPIRATION
@@ -37,7 +44,7 @@ const signup = async (req, res) => {
 }
 
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
     try {
         const user = await Users.findOne({ username: req.body.username }).select("+password");
         if (!user) {
@@ -52,17 +59,17 @@ const login = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: TOKENEXPIRATION }
         );
-        return res.status(200).json({
+         res.status(200).json({
             username: user.username,
             userId: user._id,
             token: token,
             expiresIn: TOKENEXPIRATION
         });
     } catch (err) {
-        return res.status(500).json({ error: 'Internal server error', err });
+         res.status(500).json({ error: 'Server error: '+  err });
     }
 }
 
 // add logout
 
-module.exports = { signup, login }
+

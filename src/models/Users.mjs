@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 
-const UsersSchema = new mongoose.Schema({
+const UsersSchema = new Schema({
     username: String,
     password: { type: String, required: true, select: false },
     friendList: [mongoose.Schema.Types.ObjectId],
@@ -13,5 +13,4 @@ const UsersSchema = new mongoose.Schema({
 
 const Users = new mongoose.model('Users', UsersSchema);
 
-
-module.exports = Users;
+export default Users;
